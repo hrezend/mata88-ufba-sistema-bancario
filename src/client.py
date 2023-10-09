@@ -63,28 +63,28 @@ def main():
                 print(f"{operacao.value}. {operacao.name.capitalize()}")
             op = input()
 
-            if op == str(OperacaoBancaria.SALDO.value):
+            if op == OperacaoBancaria.SALDO.value:
                 print('{} - Consultando saldo...'.format(OrigemRequisicao.CAIXA_ELETRONICO.value))
                 enviar_mensagem({'time': time, 'operation': op, 'status': StatusRequisicao.OK.value})
                 resposta_saldo = receber_resposta()
                 print(resposta_saldo['message'])
-            elif op == str(OperacaoBancaria.SAQUE.value):
+            elif op == OperacaoBancaria.SAQUE.value:
                 saque = input('[Caixa Eletrônico] - Digite o valor que deseja sacar: ')
                 enviar_mensagem({'time': time, 'operation': op, 'value': saque, 'status': StatusRequisicao.OK.value})
                 resposta_saque = receber_resposta()
                 print(resposta_saque['message'])
-            elif op == str(OperacaoBancaria.DEPOSITO.value):
+            elif op == OperacaoBancaria.DEPOSITO.value:
                 deposito = input('[Caixa Eletrônico] - Digite o valor que deseja depositar: ')
                 enviar_mensagem({'time': time, 'operation': op, 'value': deposito, 'status': StatusRequisicao.OK.value})
                 resposta_deposito = receber_resposta()
                 print(resposta_deposito['message'])
-            elif op == str(OperacaoBancaria.TRANSFERENCIA.value):
+            elif op == OperacaoBancaria.TRANSFERENCIA.value:
                 identificador_transferencia = input('[Caixa Eletrônico] - Digite o identificador da conta para a qual quer transferir: ')
                 value_transferencia = input('[Caixa Eletrônico] - Digite o valor que deseja transferir: ')
                 enviar_mensagem({'identificador_destino': identificador_transferencia, 'time': time, 'operation': op, 'value': value_transferencia, 'status': StatusRequisicao.OK.value})
                 resposta_transferencia = receber_resposta()
                 print(resposta_transferencia['message'])
-            elif op == str(OperacaoBancaria.DESCONECTAR.value):
+            elif op == OperacaoBancaria.DESCONECTAR.value:
                 enviar_mensagem({'time': time, 'operation': op, 'status': StatusRequisicao.OK.value})
                 print("{} - Obrigado por utilizar os nossos serviços!".format(OrigemRequisicao.CAIXA_ELETRONICO.value))
                 break

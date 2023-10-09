@@ -88,18 +88,17 @@ def threaded_client(connection):
 
 	while True:
 		response = receber_resposta(connection)
-
 		if response['status'] == 500:
 			break
 
-		if response['operation'] == str(OperacaoBancaria.SALDO.value):
+		if response['operation'] == OperacaoBancaria.SALDO.value:
 			incrementar_relogio_timestamp(int(response['time']), time)
 			carregar_contas()
 			incrementar_relogio()
 			incrementar_relogio()
 			text_message = OrigemRequisicao.SERVIDOR_BANCO.value + ' - Saldo disponível: R$' + str(contas_correntes[id_conta]['saldo'])
 			enviar_mensagem(connection, {'message': text_message, 'time': time, 'status': StatusRequisicao.OK.value})
-		elif response['operation'] == str(OperacaoBancaria.DEPOSITO.value):
+		elif response['operation'] == OperacaoBancaria.DEPOSITO.value:
 			incrementar_relogio_timestamp(int(response['time']), time)
 			mutex_accounts.acquire()
 			carregar_contas()
@@ -110,7 +109,7 @@ def threaded_client(connection):
 			incrementar_relogio()
 			text_message = OrigemRequisicao.SERVIDOR_BANCO.value + ' - Depósito realizado!'
 			enviar_mensagem(connection, {'message': text_message, 'time': time, 'status': StatusRequisicao.CREATED.value})
-		elif response['operation'] == str(OperacaoBancaria.SAQUE.value):
+		elif response['operation'] == OperacaoBancaria.SAQUE.value:
 			incrementar_relogio_timestamp(int(response['time']),time)
 			mutex_accounts.acquire()
 			carregar_contas()
@@ -121,7 +120,7 @@ def threaded_client(connection):
 			incrementar_relogio()
 			text_message = OrigemRequisicao.SERVIDOR_BANCO.value + ' - Saque realizado!'
 			enviar_mensagem(connection, {'message': text_message, 'time': time, 'status': StatusRequisicao.CREATED.value})
-		elif response['operation'] == str(OperacaoBancaria.TRANSFERENCIA.value):
+		elif response['operation'] == OperacaoBancaria.TRANSFERENCIA.value:
 			incrementar_relogio_timestamp(int(response['time']),time)
 			mutex_accounts.acquire()
 			carregar_contas()
@@ -133,7 +132,7 @@ def threaded_client(connection):
 			incrementar_relogio()
 			text_message = OrigemRequisicao.SERVIDOR_BANCO.value + ' - Transferência realizada!'
 			enviar_mensagem(connection, {'message': text_message, 'time': time, 'status': StatusRequisicao.CREATED.value})
-		elif response['operation'] == str(OperacaoBancaria.DESCONECTAR.value):
+		elif response['operation'] == OperacaoBancaria.DESCONECTAR.value:
 			incrementar_relogio_timestamp(int(response['time']),time)
 			incrementar_relogio()
 			text_message = OrigemRequisicao.SERVIDOR_BANCO.value + ' - Encerrando conexão...'

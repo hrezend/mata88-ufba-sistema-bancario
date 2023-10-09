@@ -4,15 +4,15 @@ from enum import Enum
 HOST = '127.0.0.1'
 PORT = 7667
 MAX_CLIENTS_CONNECTED = 5
-CONTAS_CORRENTES_DEFAULT = {'05471175581': {'nome': 'Hérson Rezende', 'saldo': 0.0}, '00000000000': {'nome': 'Kennedy Anderson', 'saldo': 0.0}}
+CONTAS_CORRENTES_DEFAULT = {'05471175581': {'nome': 'Herson Rezende', 'saldo': 0.0}, '00000000000': {'nome': 'Kennedy Anderson', 'saldo': 0.0}}
 
 # Definindo uma enumeração chamada OperacaoBancaria
 class OperacaoBancaria(Enum):
-    SALDO = 0
-    DEPOSITO = 1
-    SAQUE = 2
-    TRANSFERENCIA = 3
-    DESCONECTAR = 99
+    SALDO = '0'
+    DEPOSITO = '1'
+    SAQUE = '2'
+    TRANSFERENCIA = '3'
+    DESCONECTAR = '99'
 
 # Definindo uma enumeração chamada OrigemRequisicao
 class OrigemRequisicao(Enum):
