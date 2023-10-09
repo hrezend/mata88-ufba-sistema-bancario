@@ -2,7 +2,7 @@ import os
 import json
 import socket
 import threading
-from _thread import *
+from _thread import start_new_thread
 from json import JSONDecodeError
 from utils import OperacaoBancaria, OrigemRequisicao, StatusRequisicao, HOST, PORT, CONTAS_CORRENTES_DEFAULT, MAX_CLIENTS_CONNECTED, printar_valor_relogio_logico
 
