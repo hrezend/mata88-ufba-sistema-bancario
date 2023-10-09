@@ -30,7 +30,7 @@ def estabelecer_conexao():
         client_socket.connect((HOST, PORT))
     except socket.error as err:
         print("[Caixa Eletrônico] - Não foi possível estabelecer a conexão com o banco... Tente novamente mais tarde!")
-        print(err)
+        print(str(err))
         sys.exit(1)
 
 def enviar_mensagem(data):
