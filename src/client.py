@@ -7,11 +7,6 @@ from utils import OperacaoBancaria, OrigemRequisicao, HOST, PORT, printar_valor_
 client_socket = socket.socket()
 time = 0
 
-def printar_valor_relogio_logico(time):
-    """Função para imprimir o valor do relógio lógico."""
-    mensagem = "[Caixa Eletrônico] - Valor atual do relógio lógico: {}."
-    print(mensagem.format(time))
-
 def ajustar_valor_relogio_logico(server_time):
     """Função para ajustar o valor do relógio lógico com base no timer do server."""
     global time
