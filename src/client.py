@@ -1,7 +1,7 @@
 import socket
 import json
 import sys
-from utils import OperacaoBancaria, HOST, PORT
+from utils import OperacaoBancaria, OrigemRequisicao, HOST, PORT, printar_valor_relogio_logico
 
 # Configurações iniciais do cliente
 client_socket = socket.socket()
@@ -16,13 +16,13 @@ def ajustar_valor_relogio_logico(server_time):
     """Função para ajustar o valor do relógio lógico com base no timer do server."""
     global time
     time = max(time, int(server_time)) + 1
-    printar_valor_relogio_logico(time)
+    printar_valor_relogio_logico(OrigemRequisicao.CAIXA_ELETRONICO.value, time)
 
 def incrementar_valor_relogio_logico():
     """Função para incrementar o valor do relógio lógico."""
     global time
     time += 1
-    printar_valor_relogio_logico(time)
+    printar_valor_relogio_logico(OrigemRequisicao.CAIXA_ELETRONICO.value, time)
 
 def estabelecer_conexao():
     """Estabelece a conexão com o servidor."""
