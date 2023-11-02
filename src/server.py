@@ -22,10 +22,10 @@ def incrementar_relogio():
 	printar_valor_relogio_logico(OrigemRequisicao.SERVIDOR_BANCO.value, time)
 	mutex_time.release()
 
-def incrementar_relogio_timestamp(timestamp, atual):
+def ajustar_relogio_timestamp(timestamp, atual):
 	global time
 	mutex_time.acquire()
-	time = max(timestamp,atual) + 1
+	time = max(timestamp, atual) + 1
 	printar_valor_relogio_logico(OrigemRequisicao.SERVIDOR_BANCO.value, time)
 	mutex_time.release()
 
@@ -56,9 +56,29 @@ def receber_resposta(connection):
 		response = connection.recv(1024).decode('utf-8')
 		body = json.loads(response)
 		return body
-	except (JSONDecodeError):
-		print("{} - Erro ao decodificar a mensagem recebida do client.".format(OrigemRequisicao.SERVIDOR_BANCO.value))
+	except (JSONDecodeError, ConnectionResetError, KeyboardInterrupt):
+		print("{} - Erro ao decodificar a mensagem recebida do client. Encerrando conexão...".format(OrigemRequisicao.SERVIDOR_BANCO.value))
 		return {'status': 500}
+	
+def realizar_saque(id_conta, valor_a_sacar):
+	if (contas_correntes[id_conta]['saldo'] - float(valor_a_sacar) >= 0):
+		contas_correntes[id_conta]['saldo'] -= float(valor_a_sacar)
+		salvar_contas(contas_correntes)
+		return OrigemRequisicao.SERVIDOR_BANCO.value + ' - Saque realizado!'
+	else: 
+		return OrigemRequisicao.SERVIDOR_BANCO.value + ' - Não foi possível realizar o saque pois o saldo é insuficiente.'
+	
+def realizar_transferencia(id_conta_origem, id_conta_destino, valor_a_transferir):
+	if (contas_correntes[id_conta_origem]['saldo'] - float(valor_a_transferir) >= 0):
+		if (id_conta_destino not in contas_correntes):
+			return OrigemRequisicao.SERVIDOR_BANCO.value + ' - Não foi possível realizar a transferência pois a conta de destino não existe.' 
+		contas_correntes[id_conta_origem]['saldo'] -= float(valor_a_transferir)
+		contas_correntes[id_conta_destino]['saldo'] += float(valor_a_transferir)
+		salvar_contas(contas_correntes)
+		return OrigemRequisicao.SERVIDOR_BANCO.value + ' - Transferência realizada!'
+	else: 
+		return OrigemRequisicao.SERVIDOR_BANCO.value + ' - Não foi possível realizar a transferência pois o saldo da conta de origem é insuficiente.'
+	
 
 def threaded_client(connection):
 	# Confirma a conexão realizada com o client.
@@ -74,7 +94,7 @@ def threaded_client(connection):
 		return
 
 	id_conta = response['identificador_origem']
-	incrementar_relogio_timestamp(int(response['time']), time)
+	ajustar_relogio_timestamp(int(response['time']), time)
 	incrementar_relogio()
 
 	# Verifica se a chave da conta corrente recebida do client existe no dicionário.
@@ -92,14 +112,14 @@ def threaded_client(connection):
 			break
 
 		if response['operation'] == OperacaoBancaria.SALDO.value:
-			incrementar_relogio_timestamp(int(response['time']), time)
+			ajustar_relogio_timestamp(int(response['time']), time)
 			carregar_contas()
 			incrementar_relogio()
 			incrementar_relogio()
 			text_message = OrigemRequisicao.SERVIDOR_BANCO.value + ' - Saldo disponível: R$' + str(contas_correntes[id_conta]['saldo'])
 			enviar_mensagem(connection, {'message': text_message, 'time': time, 'status': StatusRequisicao.OK.value})
 		elif response['operation'] == OperacaoBancaria.DEPOSITO.value:
-			incrementar_relogio_timestamp(int(response['time']), time)
+			ajustar_relogio_timestamp(int(response['time']), time)
 			mutex_accounts.acquire()
 			carregar_contas()
 			contas_correntes[id_conta]['saldo'] += float(response['value'])
@@ -110,30 +130,25 @@ def threaded_client(connection):
 			text_message = OrigemRequisicao.SERVIDOR_BANCO.value + ' - Depósito realizado!'
 			enviar_mensagem(connection, {'message': text_message, 'time': time, 'status': StatusRequisicao.CREATED.value})
 		elif response['operation'] == OperacaoBancaria.SAQUE.value:
-			incrementar_relogio_timestamp(int(response['time']),time)
+			ajustar_relogio_timestamp(int(response['time']),time)
 			mutex_accounts.acquire()
 			carregar_contas()
-			contas_correntes[id_conta]['saldo'] -= float(response['value'])
-			salvar_contas(contas_correntes)
+			saque_response_message = realizar_saque(id_conta, response['value'])
 			mutex_accounts.release()
 			incrementar_relogio()
 			incrementar_relogio()
-			text_message = OrigemRequisicao.SERVIDOR_BANCO.value + ' - Saque realizado!'
-			enviar_mensagem(connection, {'message': text_message, 'time': time, 'status': StatusRequisicao.CREATED.value})
+			enviar_mensagem(connection, {'message': saque_response_message, 'time': time, 'status': StatusRequisicao.CREATED.value})
 		elif response['operation'] == OperacaoBancaria.TRANSFERENCIA.value:
-			incrementar_relogio_timestamp(int(response['time']),time)
+			ajustar_relogio_timestamp(int(response['time']),time)
 			mutex_accounts.acquire()
 			carregar_contas()
-			contas_correntes[id_conta]['saldo'] -= float(response['value'])
-			contas_correntes[response['identificador_destino']]['saldo']+=float(response['value'])
-			salvar_contas(contas_correntes)
+			transferencia_response_message = realizar_transferencia(id_conta, response['identificador_destino'], response['value'])
 			mutex_accounts.release()
 			incrementar_relogio()
 			incrementar_relogio()
-			text_message = OrigemRequisicao.SERVIDOR_BANCO.value + ' - Transferência realizada!'
-			enviar_mensagem(connection, {'message': text_message, 'time': time, 'status': StatusRequisicao.CREATED.value})
+			enviar_mensagem(connection, {'message': transferencia_response_message, 'time': time, 'status': StatusRequisicao.CREATED.value})
 		elif response['operation'] == OperacaoBancaria.DESCONECTAR.value:
-			incrementar_relogio_timestamp(int(response['time']),time)
+			ajustar_relogio_timestamp(int(response['time']),time)
 			incrementar_relogio()
 			text_message = OrigemRequisicao.SERVIDOR_BANCO.value + ' - Encerrando conexão...'
 			enviar_mensagem(connection, {'message': text_message, 'time': time, 'status': StatusRequisicao.OK.value})
@@ -164,7 +179,8 @@ def main():
 			global thread_count
 			thread_count += 1
 			print("{} - Thread número: {}".format(OrigemRequisicao.SERVIDOR_BANCO.value, str(thread_count)))
-		except (SystemExit, KeyboardInterrupt):
+		except Exception as exc:
+			print(exc)
 			break
 
 	server_socket.close()

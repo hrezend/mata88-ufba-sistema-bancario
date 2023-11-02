@@ -24,7 +24,7 @@ def estabelecer_conexao():
     try:
         client_socket.connect((HOST, PORT))
         resposta_conexao = receber_resposta()
-        print("{} - {}".format(OrigemRequisicao.CAIXA_ELETRONICO.value, resposta_conexao['message']))
+        print("{} - {}".format(OrigemRequisicao.SERVIDOR_BANCO.value, resposta_conexao['message']))
     except socket.error as err:
         print("{} - Não foi possível estabelecer a conexão com o banco... Tente novamente mais tarde!".format(OrigemRequisicao.CAIXA_ELETRONICO.value))
         print(str(err))
@@ -48,12 +48,16 @@ def main():
     estabelecer_conexao()
 
     # Enviar RG/CPF ao servidor
-    identificador_pessoa = input('[Caixa Eletrônico] - Digite seu CPF ou RG: ')
-    enviar_mensagem({'identificador_origem': identificador_pessoa, 'time': time, 'status': StatusRequisicao.OK.value})
-    resposta_identificador = receber_resposta()
-    print(resposta_identificador['message'])
-    if(resposta_identificador['status'] == 404):
-        print("{} - Por favor, tente novamente.".format(OrigemRequisicao.CAIXA_ELETRONICO.value))
+    try:
+        identificador_pessoa = input('[Caixa Eletrônico] - Digite seu CPF ou RG: ')
+        enviar_mensagem({'identificador_origem': identificador_pessoa, 'time': time, 'status': StatusRequisicao.OK.value})
+        resposta_identificador = receber_resposta()
+        print(resposta_identificador['message'])
+        if(resposta_identificador['status'] == 404):
+            print("{} - Por favor, tente novamente mais tarde.".format(OrigemRequisicao.CAIXA_ELETRONICO.value))
+            sys.exit(1)
+    except (KeyboardInterrupt, ConnectionResetError):
+        print("\n{} - Operação cancelada.".format(OrigemRequisicao.CAIXA_ELETRONICO.value))
         sys.exit(1)
 
     while True:
@@ -90,7 +94,7 @@ def main():
                 break
             else:
                 print("{} - Comando inválido, tente novamente!".format(OrigemRequisicao.CAIXA_ELETRONICO.value))
-        except (SystemExit, KeyboardInterrupt):
+        except (KeyboardInterrupt, ConnectionResetError):
             break
 
     client_socket.close()
