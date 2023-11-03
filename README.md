@@ -6,7 +6,7 @@
 
 A **especificação** do trabalho pode ser encontrada [aqui](assets/especificacao.pdf).
 
-A desrição da **solução** elaborada pelo grupo pode ser encontrada [aqui](assets/solucao.pdf).
+A descrição da **solução** elaborada pelo grupo pode ser encontrada [aqui](assets/solucao.pdf).
 
 A **apresentação** do grupo, em slides, pode ser encontrada [aqui](assets/apresentacao.pdf).
 
