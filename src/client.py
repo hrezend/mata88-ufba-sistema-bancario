@@ -1,7 +1,7 @@
 import socket
 import json
 import sys
-from utils import OperacaoBancaria, OrigemRequisicao, StatusRequisicao, HOST, PORT, printar_valor_relogio_logico
+from utils import OperacaoBancaria, OrigemRequisicao, StatusRequisicao,  HOST, PORT, printar_valor_relogio_logico
 
 # Configurações iniciais do cliente
 client_socket = socket.socket()
@@ -26,7 +26,8 @@ def estabelecer_conexao():
         resposta_conexao = receber_resposta()
         print("{} - {}".format(OrigemRequisicao.SERVIDOR_BANCO.value, resposta_conexao['message']))
     except socket.error as err:
-        print("{} - Não foi possível estabelecer a conexão com o banco... Tente novamente mais tarde!".format(OrigemRequisicao.CAIXA_ELETRONICO.value))
+        print("{} - Não foi possível estabelecer a conexão com o banco... Tente novamente mais tarde!"
+            .format(OrigemRequisicao.CAIXA_ELETRONICO.value))
         print(str(err))
         sys.exit(1)
 

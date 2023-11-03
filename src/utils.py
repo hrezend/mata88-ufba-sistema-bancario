@@ -4,7 +4,11 @@ from enum import Enum
 HOST = '127.0.0.1'
 PORT = 7667
 MAX_CLIENTS_CONNECTED = 5
-CONTAS_CORRENTES_DEFAULT = {'123': {'nome': 'Kennedy Anderson', 'saldo': 0.0}, '456': {'nome': 'Herson Rezende', 'saldo': 0.0}, '789': {'nome': 'Raimundo Macedo', 'saldo': 0.0}}
+CONTAS_CORRENTES_DEFAULT = {
+    '123': {'nome': 'Kennedy Anderson', 'saldo': 0.0}, 
+    '456': {'nome': 'Herson Rezende', 'saldo': 0.0}, 
+    '789': {'nome': 'Raimundo Macedo', 'saldo': 0.0}
+}
 
 # Definindo uma enumeração chamada OperacaoBancaria
 class OperacaoBancaria(Enum):

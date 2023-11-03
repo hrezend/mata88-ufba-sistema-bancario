@@ -8,6 +8,8 @@ A **especificação** do trabalho pode ser encontrada [aqui](assets/especificaca
 
 A desrição da **solução** elaborada pelo grupo pode ser encontrada [aqui](assets/solucao.pdf).
 
+A **apresentação** em slides grupo pode ser encontrada [aqui](assets/apresentacao.pdf).
+
 ---
 
 ### Como executar este código?

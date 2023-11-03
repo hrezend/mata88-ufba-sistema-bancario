@@ -39,8 +39,10 @@ def carregar_contas():
 		with open("contas_correntes.json", "r") as input_file:
 			contas_correntes = json.load(input_file)
 	except (FileNotFoundError):
-		print("{} - Não foi possível recuperar as contas correntes do arquivo.".format(OrigemRequisicao.SERVIDOR_BANCO.value))
-		print("{} - Utilizaremos as contas default que estão disponíveis no arquivo 'utils.py'.".format(OrigemRequisicao.SERVIDOR_BANCO.value))
+		print("{} - Não foi possível recuperar as contas correntes do arquivo."
+			.format(OrigemRequisicao.SERVIDOR_BANCO.value))
+		print("{} - Utilizaremos as contas default que estão disponíveis no arquivo 'utils.py'."
+			.format(OrigemRequisicao.SERVIDOR_BANCO.value))
 		contas_correntes = CONTAS_CORRENTES_DEFAULT
 		salvar_contas(contas_correntes)
 	return contas_correntes
@@ -57,27 +59,28 @@ def receber_resposta(connection):
 		body = json.loads(response)
 		return body
 	except (JSONDecodeError, ConnectionResetError, KeyboardInterrupt):
-		print("{} - Erro ao decodificar a mensagem recebida do client. Encerrando conexão...".format(OrigemRequisicao.SERVIDOR_BANCO.value))
+		print("{} - Erro ao decodificar a mensagem recebida do client. Encerrando conexão..."
+			.format(OrigemRequisicao.SERVIDOR_BANCO.value))
 		return {'status': 500}
 	
 def realizar_saque(id_conta, valor_a_sacar):
 	if (contas_correntes[id_conta]['saldo'] - float(valor_a_sacar) >= 0):
 		contas_correntes[id_conta]['saldo'] -= float(valor_a_sacar)
 		salvar_contas(contas_correntes)
-		return OrigemRequisicao.SERVIDOR_BANCO.value + ' - Saque realizado!'
+		return "{} - Saque realizado!".format(OrigemRequisicao.SERVIDOR_BANCO.value)
 	else: 
-		return OrigemRequisicao.SERVIDOR_BANCO.value + ' - Não foi possível realizar o saque pois o saldo é insuficiente.'
+		return "{} - Não foi possível realizar o saque pois o saldo é insuficiente.".format(OrigemRequisicao.SERVIDOR_BANCO.value)
 	
 def realizar_transferencia(id_conta_origem, id_conta_destino, valor_a_transferir):
 	if (contas_correntes[id_conta_origem]['saldo'] - float(valor_a_transferir) >= 0):
 		if (id_conta_destino not in contas_correntes):
-			return OrigemRequisicao.SERVIDOR_BANCO.value + ' - Não foi possível realizar a transferência pois a conta de destino não existe.' 
+			return "{} - Não foi possível realizar a transferência pois a conta de destino não existe.".format(OrigemRequisicao.SERVIDOR_BANCO.value)
 		contas_correntes[id_conta_origem]['saldo'] -= float(valor_a_transferir)
 		contas_correntes[id_conta_destino]['saldo'] += float(valor_a_transferir)
 		salvar_contas(contas_correntes)
-		return OrigemRequisicao.SERVIDOR_BANCO.value + ' - Transferência realizada!'
+		return "{} - Transferência realizada!".format(OrigemRequisicao.SERVIDOR_BANCO.value)
 	else: 
-		return OrigemRequisicao.SERVIDOR_BANCO.value + ' - Não foi possível realizar a transferência pois o saldo da conta de origem é insuficiente.'
+		return "{} - Não foi possível realizar a transferência pois o saldo da conta de origem é insuficiente.".format(OrigemRequisicao.SERVIDOR_BANCO.value)
 	
 
 def threaded_client(connection):
