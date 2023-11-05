@@ -93,7 +93,6 @@ def realizar_transferencia(id_conta_origem, id_conta_destino, valor_a_transferir
 		return "{} - Transferência realizada!".format(OrigemRequisicao.SERVIDOR_BANCO.value)
 	else: 
 		return "{} - Não foi possível realizar a transferência pois o saldo da conta de origem é insuficiente.".format(OrigemRequisicao.SERVIDOR_BANCO.value)
-	
 
 def threaded_client(connection):
 	# Confirma a conexão realizada com o client.
