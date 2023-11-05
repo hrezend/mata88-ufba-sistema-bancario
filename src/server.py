@@ -63,7 +63,17 @@ def receber_resposta(connection):
 			.format(OrigemRequisicao.SERVIDOR_BANCO.value))
 		return {'status': 500}
 	
+def realizar_deposito(id_conta, valor_a_depositar):
+	if (float(valor_a_depositar) <= 0):
+		return "{} - O valor digitado para depósito é inválido.".format(OrigemRequisicao.SERVIDOR_BANCO.value)
+	else:
+		contas_correntes[id_conta]['saldo'] += float(valor_a_depositar)
+		salvar_contas(contas_correntes)
+		return "{} - Depósito realizado!".format(OrigemRequisicao.SERVIDOR_BANCO.value)
+
 def realizar_saque(id_conta, valor_a_sacar):
+	if (float(valor_a_sacar) <= 0):
+		return "{} - O valor digitado para saque é inválido.".format(OrigemRequisicao.SERVIDOR_BANCO.value)
 	if (contas_correntes[id_conta]['saldo'] - float(valor_a_sacar) >= 0):
 		contas_correntes[id_conta]['saldo'] -= float(valor_a_sacar)
 		salvar_contas(contas_correntes)
@@ -72,6 +82,8 @@ def realizar_saque(id_conta, valor_a_sacar):
 		return "{} - Não foi possível realizar o saque pois o saldo é insuficiente.".format(OrigemRequisicao.SERVIDOR_BANCO.value)
 	
 def realizar_transferencia(id_conta_origem, id_conta_destino, valor_a_transferir):
+	if (float(valor_a_transferir) <= 0):
+		return "{} - O valor digitado para transferência é inválido.".format(OrigemRequisicao.SERVIDOR_BANCO.value)
 	if (contas_correntes[id_conta_origem]['saldo'] - float(valor_a_transferir) >= 0):
 		if (id_conta_destino not in contas_correntes):
 			return "{} - Não foi possível realizar a transferência pois a conta de destino não existe.".format(OrigemRequisicao.SERVIDOR_BANCO.value)
@@ -125,13 +137,11 @@ def threaded_client(connection):
 			ajustar_relogio_timestamp(int(response['time']), time)
 			mutex_accounts.acquire()
 			carregar_contas()
-			contas_correntes[id_conta]['saldo'] += float(response['value'])
-			salvar_contas(contas_correntes)
+			deposito_response_message = realizar_deposito(id_conta, response['value'])
 			mutex_accounts.release()
 			incrementar_relogio()
 			incrementar_relogio()
-			text_message = OrigemRequisicao.SERVIDOR_BANCO.value + ' - Depósito realizado!'
-			enviar_mensagem(connection, {'message': text_message, 'time': time, 'status': StatusRequisicao.CREATED.value})
+			enviar_mensagem(connection, {'message': deposito_response_message, 'time': time, 'status': StatusRequisicao.CREATED.value})
 		elif response['operation'] == OperacaoBancaria.SAQUE.value:
 			ajustar_relogio_timestamp(int(response['time']),time)
 			mutex_accounts.acquire()
